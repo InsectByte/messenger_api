@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  mariadb:
+    image: mariadb:10.8
+    user: root
+    ports:
+      - 3306:3306
+    volumes:
+      - ~/apps/mariadb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=messenger
+      - MYSQL_USER=messenger
+      - MYSQL_DATABASE=messenger_db
