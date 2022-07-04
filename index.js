@@ -35,10 +35,10 @@ io.use(socketioJwt.authorize({
 }));
  
 io.on('connect', (socket) => {
-  console.log(socket.id + ' has connected');
+  console.log(socket.decoded_token.user.user.username + ' has connected');
 
     socket.on('disconnect', () => {
-        console.log(socket.id + 'has disconnected');
+        console.log(socket.decoded_token.user.user.username + ' has disconnected');
         socket.removeAllListeners();
     });
 
@@ -49,8 +49,10 @@ io.on('connect', (socket) => {
             .filter(room => room !== socket.id)
             .forEach(id => {
                 socket.leave(id);
+                console.log(socket.decoded_token.user.user.username + ' has left room ' + id);
                 socket.removeAllListeners(`onMessage`)
             });
+            console.log(`${socket.decoded_token.user.user.username} joined ${room}`);
         socket.join(room);
 
         socket.on('onMessage', message => {
@@ -59,9 +61,11 @@ io.on('connect', (socket) => {
                 user: socket.decoded_token.user.user.username,
                 created_at: new Date(),
             };
+            console.log(message_obj);
             Array.from(socket.rooms)
                 .filter(room => room !== socket.id)
                 .forEach(id => {
+                    console.log(`${socket.decoded_token.user.user.username} sent ${message_obj.message} to ${id}`);
                     socket.to(id).emit('onMessage', message_obj);
                 });
         });

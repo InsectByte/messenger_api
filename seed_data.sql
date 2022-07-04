@@ -24,8 +24,8 @@ CREATE TABLE room (
 );
 
 CREATE TABLE userroom (
-    user_id UUID NOT NULL,
-    room_id UUID NOT NULL,
+    user_id UUID PRIMARY KEY,
+    room_id UUID PRIMARY KEY,
     joined_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_userroom_userid FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,

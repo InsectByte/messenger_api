@@ -52,8 +52,6 @@ app.get('/rooms', async (req, res) => {
 app.post('/room', async (req, res) => {
     authenticateToken(req, res , () => {});
 
-    console.log(req.user)
-
     const userid = req.user.user.user.id;
     const roomid = crypto.randomUUID();
     const roomname = req.body.roomname;
@@ -84,8 +82,57 @@ app.post('/room', async (req, res) => {
         }
     );
     connection.end();
-    return res.status(200).json({
+    return res.status(201).json({
         message: 'Room created'
+    });
+});
+
+app.post('/join', async (req, res) => {
+    authenticateToken(req, res , () => {});
+    console.log(req.body.roomid);
+    const userid = req.user.user.user.id;
+    const roomid = req.body.roomid;
+    const connection = await database.getConnection();
+
+    connection.query(
+        'INSERT INTO userroom (user_id, room_id, joined_at) VALUES (?, ?, NOW())',
+        [userid, roomid],
+        (err, rows) => {
+            if (err) {
+                connection.end();
+                return res.status(500).json({
+                    error: 'Something went wrong'
+                });
+            }
+        }
+    );
+    connection.end();
+    return res.status(201).json({
+        message: 'Room joined'
+    });
+});
+
+app.delete('/leave', async (req, res) => {
+    authenticateToken(req, res , () => {});
+    const userid = req.user.user.user.id;
+    const roomid = req.body.roomid;
+    const connection = await database.getConnection();
+
+    connection.query(
+        'DELETE FROM userroom WHERE user_id = ? AND room_id = ?',
+        [userid, roomid],
+        (err, rows) => {
+            if (err) {
+                connection.end();
+                return res.status(500).json({
+                    error: 'Something went wrong'
+                });
+            }
+        }
+    );
+    connection.end();
+    return res.status(200).json({
+        message: 'Room left'
     });
 });
 
